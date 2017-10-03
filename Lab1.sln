@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Broker", "Lab1\Broker.csproj", "{1538AA16-8D34-4155-9044-F91373C6233E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sender", "Sender\Sender.csproj", "{2D6F550D-C3E2-4C11-8999-8068FA70CA31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reciever", "Reciever\Reciever.csproj", "{D5257781-B58C-4BA6-AA72-B45E75492001}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1538AA16-8D34-4155-9044-F91373C6233E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1538AA16-8D34-4155-9044-F91373C6233E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1538AA16-8D34-4155-9044-F91373C6233E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1538AA16-8D34-4155-9044-F91373C6233E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D6F550D-C3E2-4C11-8999-8068FA70CA31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D6F550D-C3E2-4C11-8999-8068FA70CA31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D6F550D-C3E2-4C11-8999-8068FA70CA31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D6F550D-C3E2-4C11-8999-8068FA70CA31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5257781-B58C-4BA6-AA72-B45E75492001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5257781-B58C-4BA6-AA72-B45E75492001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5257781-B58C-4BA6-AA72-B45E75492001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5257781-B58C-4BA6-AA72-B45E75492001}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
