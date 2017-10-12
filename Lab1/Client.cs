@@ -12,6 +12,7 @@ namespace Lab1
 	class Client
 	{
 		public TcpClient client;
+		public bool IsSender = false;
 		public Client(TcpClient tcpClient)
 		{
 			client = tcpClient;
@@ -35,7 +36,11 @@ namespace Lab1
 
 				Message msg = JsonConvert.DeserializeObject<Message>(builder.ToString());
 				Broker.GetInstance().ProcessingMsg(msg, stream);
-				//if (msg.IsSender)
+				if (msg.IsSender) IsSender = true;
+				//	while (true)
+				//	{
+				//		stream.
+				//	}
 				//	Broker.GetInstance().AddMsg(msg);
 				//else Broker.GetInstance().GetAnswerMsg(msg, stream);
 				// отправляем обратно сообщение в верхнем регистре

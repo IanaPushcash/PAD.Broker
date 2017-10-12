@@ -33,20 +33,24 @@ namespace Reciever
 				// отправка сообщения
 				stream.Write(data, 0, data.Length);
 
-
-				// получаем ответ
-				data = new byte[1000000]; // буфер для получаемых данных
-				StringBuilder builder = new StringBuilder();
-				int bytes = 0;
-				do
+				while (true)
 				{
-					bytes = stream.Read(data, 0, data.Length);
-					builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+					if (stream.DataAvailable)
+					{
+						// получаем ответ
+						data = new byte[1000000]; // буфер для получаемых данных
+						StringBuilder builder = new StringBuilder();
+						int bytes = 0;
+						do
+						{
+							bytes = stream.Read(data, 0, data.Length);
+							builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+						} while (stream.DataAvailable);
+						stream.Flush();
+						var message = builder.ToString();
+						Console.WriteLine("Was got {0}", message);
+					}
 				}
-				while (stream.DataAvailable);
-
-				var message = builder.ToString();
-				Console.WriteLine("Was got {0}", message);
 			}
 			catch (Exception ex)
 			{

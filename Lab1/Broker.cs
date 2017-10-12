@@ -5,30 +5,26 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 
 namespace Lab1
 {
 	class Broker
 	{
 		private static readonly Broker instance = new Broker();
+		private QueueDictionary queueDictionary { get; set; }
 
 		private Broker()
 		{
-			QueueDictionary = new Dictionary<string, Queue<Message>>();
+			queueDictionary = new QueueDictionary();
 		}
 
 		public static Broker GetInstance()
 		{
 			return instance;
 		}
-		public Dictionary<string, Queue<Message>> QueueDictionary { get; set; }
 
-		public void AddMsg(Message msg)
-		{
-			if (!QueueDictionary.ContainsKey(msg.Name))
-				QueueDictionary.Add(msg.Name, new Queue<Message>());
-			QueueDictionary[msg.Name].Enqueue(msg);
-		}
+		
 
 		public void GetAnswerMsg(Message msg, NetworkStream stream)
 		{
@@ -41,21 +37,27 @@ namespace Lab1
 			if (msg.TypeMsg != "die" && msg.TypeMsg != "willdie")
 			{
 				if (msg.IsSender)
-					AddMsg(msg);
+					queueDictionary.AddMessage(msg);
 				else
 				{
-					if (!QueueDictionary.ContainsKey(msg.TypeMsg))
+					//if (!QueueDictionary.ContainsKey(msg.TypeMsg))
+					//{
+					//	GetAnswerMsg(new Message() {IsSender = false, Msg = "Non-existend type msg", Name = "Server", TypeMsg = "Error"}, stream );
+					//	return;
+					//}
+					//if (QueueDictionary[msg.TypeMsg].Count == 0)
+					//{
+					//	GetAnswerMsg(new Message() { IsSender = false, Msg = "Queue is empty", Name = "Server", TypeMsg = "Error" }, stream);
+					//	return;
+					//}
+					//Message m = new Message();
+					//QueueDictionary[msg.TypeMsg].TryDequeue(out m);
+					while (true)
 					{
-						GetAnswerMsg(new Message() {IsSender = false, Msg = "Non-existend type msg", Name = "Server", TypeMsg = "Error"}, stream );
-						return;
+						GetAnswerMsg(new Message() { Msg = "Hello" }, stream);
 					}
-					if (QueueDictionary[msg.TypeMsg].Count == 0)
-					{
-						GetAnswerMsg(new Message() { IsSender = false, Msg = "Queue is empty", Name = "Server", TypeMsg = "Error" }, stream);
-						return;
-					}
-					GetAnswerMsg(QueueDictionary[msg.TypeMsg].Dequeue(), stream);
 				}
+					
 			}
 		}
 	}
