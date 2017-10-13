@@ -14,8 +14,6 @@ namespace Lab1
 		const int port = 8888;
 		static TcpListener listener;
 		private static Thread _serverThread;
-		private static List<Client> clients = new List<Client>();
-
 		static void Main(string[] args)
 		{
 			_serverThread = new Thread(startServer) {IsBackground = true};
@@ -35,7 +33,6 @@ namespace Lab1
 				{
 					TcpClient client = listener.AcceptTcpClient();
 					Client clientObject = new Client(client);
-					clients.Add(clientObject);
 
 					// создаем новый поток для обслуживания нового клиента
 					Thread clientThread = new Thread(new ThreadStart(clientObject.Process));

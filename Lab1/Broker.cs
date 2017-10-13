@@ -12,11 +12,13 @@ namespace Lab1
 	class Broker
 	{
 		private static readonly Broker instance = new Broker();
-		private QueueDictionary queueDictionary { get; set; }
+		private ListDictionary queueDictionary;
+		public static List<Client> Subscribers { get; set; }
 
 		private Broker()
 		{
-			queueDictionary = new QueueDictionary();
+			queueDictionary = new ListDictionary();
+			Subscribers = new List<Client>();
 		}
 
 		public static Broker GetInstance()
@@ -26,11 +28,7 @@ namespace Lab1
 
 		
 
-		public void GetAnswerMsg(Message msg, NetworkStream stream)
-		{
-			var retMsg = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(msg));
-			stream.Write(retMsg, 0, retMsg.Length);
-		}
+		
 
 		public void ProcessingMsg(Message msg, NetworkStream stream)
 		{
@@ -40,6 +38,7 @@ namespace Lab1
 					queueDictionary.AddMessage(msg);
 				else
 				{
+
 					//if (!QueueDictionary.ContainsKey(msg.TypeMsg))
 					//{
 					//	GetAnswerMsg(new Message() {IsSender = false, Msg = "Non-existend type msg", Name = "Server", TypeMsg = "Error"}, stream );
@@ -52,10 +51,11 @@ namespace Lab1
 					//}
 					//Message m = new Message();
 					//QueueDictionary[msg.TypeMsg].TryDequeue(out m);
-					while (true)
-					{
-						GetAnswerMsg(new Message() { Msg = "Hello" }, stream);
-					}
+					//while (true)
+					//{
+						queueDictionary.SendMessage(msg, stream);
+						//GetAnswerMsg(new Message() { Msg = "Hello" }, stream);
+					//}
 				}
 					
 			}

@@ -12,11 +12,12 @@ namespace Lab1
 	class Client
 	{
 		public TcpClient client;
-		public bool IsSender = false;
 		public Client(TcpClient tcpClient)
 		{
 			client = tcpClient;
 		}
+		public string TargetAuthor { get; set; }
+		public string TargetType { get; set; }
 
 		public void Process()
 		{
@@ -35,8 +36,13 @@ namespace Lab1
 				} while (stream.DataAvailable);
 
 				Message msg = JsonConvert.DeserializeObject<Message>(builder.ToString());
+				if (!msg.IsSender)
+				{
+					TargetAuthor = msg.Name;
+					TargetType = msg.TypeMsg;
+					Broker.Subscribers.Add(this);
+				}
 				Broker.GetInstance().ProcessingMsg(msg, stream);
-				if (msg.IsSender) IsSender = true;
 				//	while (true)
 				//	{
 				//		stream.
@@ -58,6 +64,7 @@ namespace Lab1
 					stream.Close();
 				if (client != null)
 					client.Close();
+				Broker.Subscribers.Remove(this);
 			}
 		}
 	}
