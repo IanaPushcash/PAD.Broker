@@ -26,10 +26,6 @@ namespace Lab1
 			return instance;
 		}
 
-		
-
-		
-
 		public void ProcessingMsg(Message msg, NetworkStream stream)
 		{
 			if (msg.TypeMsg != "die" && msg.TypeMsg != "willdie")

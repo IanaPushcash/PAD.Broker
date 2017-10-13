@@ -155,5 +155,10 @@ namespace Lab1
 		{
 			SerializeQueue(fileName);
 		}
+
+		~ListDictionary()
+		{
+			SerializeQueue(fileName);
+		}
 	}
 }
