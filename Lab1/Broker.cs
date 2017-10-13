@@ -53,7 +53,7 @@ namespace Lab1
 					//QueueDictionary[msg.TypeMsg].TryDequeue(out m);
 					//while (true)
 					//{
-						queueDictionary.SendMessage(msg, stream);
+						queueDictionary.SendMessageSub(msg, stream);
 						//GetAnswerMsg(new Message() { Msg = "Hello" }, stream);
 					//}
 				}

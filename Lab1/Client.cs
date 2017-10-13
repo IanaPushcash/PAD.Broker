@@ -60,11 +60,12 @@ namespace Lab1
 			}
 			finally
 			{
-				if (stream != null)
-					stream.Close();
-				if (client != null)
-					client.Close();
-				Broker.Subscribers.Remove(this);
+				//if (stream != null)
+				//	stream.Close();
+				//if (client != null)
+				//	client.Close();
+				if (stream == null)
+					Broker.Subscribers.Remove(this);
 			}
 		}
 	}

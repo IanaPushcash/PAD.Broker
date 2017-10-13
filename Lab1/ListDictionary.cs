@@ -28,7 +28,7 @@ namespace Lab1
 			if (!qDictionary.ContainsKey(msg.Name))
 				qDictionary.TryAdd(msg.Name, new List<Message>());
 			qDictionary[msg.Name].Add(msg);
-			TrySendToSubscribers(Broker.Subscribers);
+			SendMessage(ref msg);
 		}
 
 		private void TrySendToSubscribers(List<Client> subs)
@@ -45,27 +45,63 @@ namespace Lab1
 				if (msg.Name != "" && msg.TypeMsg != "" && existName(msg.Name) && existType(msg.Name, msg.TypeMsg))
 				{
 					var mes = qDictionary[msg.Name].Last(m => m.TypeMsg == msg.TypeMsg);
-					qDictionary[msg.Name].Remove(mes);
-					SendMessage(mes);
+					SendMessage(ref mes);
+					continue;
 				}
-				
+				if (msg.Name != "" && msg.TypeMsg == "" && existName(msg.Name) && qDictionary[msg.Name].Count > 0)
+				{
+					var mes = qDictionary[msg.Name].Last();
+					SendMessage(ref mes);
+					continue;
+				}
+				if (msg.Name == "" && msg.TypeMsg != "" && existType(msg.Name, msg.TypeMsg))
+				{
+					foreach (var key in qDictionary.Keys)
+					{
+						if (qDictionary[key].Any(q => q.TypeMsg == msg.TypeMsg))
+						{
+							var mes = qDictionary[key].Last(q => q.TypeMsg == msg.TypeMsg);
+							SendMessage(ref mes);
+							continue;
+						}
+					}
+				}
+				if (msg.Name == "" && msg.TypeMsg == "" && existName(msg.Name) && existType(msg.Name, msg.TypeMsg))
+				{
+					foreach (var key in qDictionary.Keys)
+					{
+						if (qDictionary[key].Any())
+						{
+							var mes = qDictionary[key].Last();
+							SendMessage(ref mes);
+							continue;
+						}
+					}
+				}
 
 			}
 		}
 
-		public void SendMessage(Message msg)
+		public void SendMessage(ref Message msg)
 		{
+			var r = false;
 			foreach (var subscriber in Broker.Subscribers)
 			{
-				if ((subscriber.TargetAuthor == "" || subscriber.TargetAuthor == msg.Name) && (subscriber.TargetType == "" || subscriber.TargetType == msg.TypeMsg))
+				if ((subscriber.TargetAuthor == "" || subscriber.TargetAuthor == msg.Name) &&
+				    (subscriber.TargetType == "" || subscriber.TargetType == msg.TypeMsg))
+				{
 					GetAnswerMsg(msg, subscriber.client.GetStream());
+					r = true;
+				}
 			}
+			if (r) qDictionary[msg.Name].Remove(msg);
 		}
 
 		private bool existType(string msgName, string msgTypeMsg)
 		{
-			if (msgTypeMsg == "") return true;
+			if (msgTypeMsg == "" && qDictionary.Keys.Count > 0 && qDictionary.Any(l=>l.Value.Count>0)) return true;
 			if (msgName != "" && existName(msgName)) return qDictionary[msgName].Any(q => q.TypeMsg == msgTypeMsg);
+			if (msgName == "") return existName(msgName);
 			foreach (var key in qDictionary.Keys)
 			{
 				if (qDictionary[key].Any(q => q.TypeMsg == msgTypeMsg))
@@ -76,7 +112,7 @@ namespace Lab1
 
 		private bool existName(string msgName)
 		{
-			return qDictionary.Keys.Contains(msgName) || msgName == "";
+			return qDictionary.Keys.Contains(msgName) || (msgName == "" && qDictionary.Keys.Count>0);
 		}
 
 		public void GetAnswerMsg(Message msg, NetworkStream stream)
