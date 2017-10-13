@@ -19,29 +19,30 @@ namespace Reciever
 			{
 				using (Reciever reciever = new Reciever(sName))
 				{
-					while (true)
-					{
-
-						var start = DateTime.Now;
+					//while (true)
+					//{
+					//	Console.WriteLine("Enter msg type: ");
+					//	msgType = Console.ReadLine();
+						//var start = DateTime.Now;
 						if (msgType == "die")
 						{
 							reciever.Send(new Message() { IsSender = false, Msg = "", Name = sName, TypeMsg = "willdie" });
-							break;
+							//break;
 						}
 						else
 						{
 							reciever.Send(new Message() { IsSender = false, Msg = "", Name = sName, TypeMsg = msgType });
 						}
-						while (start.AddSeconds(10) > DateTime.Now) ;
-					}
+						//while (start.AddSeconds(10) > DateTime.Now) ;
+					//}
 				}
 			});
 			task.Start();
-			while (true)
-			{
-				Console.WriteLine("Enter msg type: ");
-				msgType = Console.ReadLine();
-			}
+			task.Wait();
+			//while (true)
+			//{
+
+			//}
 		}
 	}
 }

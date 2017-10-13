@@ -28,7 +28,7 @@ namespace Lab1
 			if (!qDictionary.ContainsKey(msg.Name))
 				qDictionary.TryAdd(msg.Name, new List<Message>());
 			qDictionary[msg.Name].Add(msg);
-			SendMessage(ref msg);
+			SendMessage(msg);
 		}
 
 		private void TrySendToSubscribers(List<Client> subs)
@@ -36,53 +36,66 @@ namespace Lab1
 			throw new NotImplementedException();
 		}
 
-		public bool SendMessageSub(Message msg, NetworkStream stream)
+		public void SendMessageSub(Message msg, NetworkStream stream)
 		{
-			if (!existName(msg.Name) || !existType(msg.Name,msg.TypeMsg))
-				GetAnswerMsg(new Message() { IsSender = false, Msg = "Non-existend type msg", Name = "Server", TypeMsg = "Error" }, stream);
-			while (true)
+			if (!existName(msg.Name) || !existType(msg.Name, msg.TypeMsg))
+				GetAnswerMsg(new Message() {IsSender = false, Msg = "Mising post doesnt exist", Name = "Server", TypeMsg = "Error"},
+					stream);
+			//while (true)
+			//{
+			if (msg.Name != "" && msg.TypeMsg != "" && existName(msg.Name) && existType(msg.Name, msg.TypeMsg))
 			{
-				if (msg.Name != "" && msg.TypeMsg != "" && existName(msg.Name) && existType(msg.Name, msg.TypeMsg))
+				for (int i = qDictionary[msg.Name].Count - 1; i >= 0; i--)
 				{
-					var mes = qDictionary[msg.Name].Last(m => m.TypeMsg == msg.TypeMsg);
-					SendMessage(ref mes);
-					continue;
-				}
-				if (msg.Name != "" && msg.TypeMsg == "" && existName(msg.Name) && qDictionary[msg.Name].Count > 0)
-				{
-					var mes = qDictionary[msg.Name].Last();
-					SendMessage(ref mes);
-					continue;
-				}
-				if (msg.Name == "" && msg.TypeMsg != "" && existType(msg.Name, msg.TypeMsg))
-				{
-					foreach (var key in qDictionary.Keys)
+					if (qDictionary[msg.Name][i].TypeMsg == msg.TypeMsg)
 					{
-						if (qDictionary[key].Any(q => q.TypeMsg == msg.TypeMsg))
-						{
-							var mes = qDictionary[key].Last(q => q.TypeMsg == msg.TypeMsg);
-							SendMessage(ref mes);
-							continue;
-						}
+						var mes = qDictionary[msg.Name][i];
+						SendMessage(mes);
 					}
 				}
-				if (msg.Name == "" && msg.TypeMsg == "" && existName(msg.Name) && existType(msg.Name, msg.TypeMsg))
-				{
-					foreach (var key in qDictionary.Keys)
-					{
-						if (qDictionary[key].Any())
-						{
-							var mes = qDictionary[key].Last();
-							SendMessage(ref mes);
-							continue;
-						}
-					}
-				}
-
+				//continue;
 			}
+			else if (msg.Name != "" && msg.TypeMsg == "" && existName(msg.Name) && qDictionary[msg.Name].Count > 0)
+			{
+				for (int i = qDictionary[msg.Name].Count - 1; i >= 0; i--)
+				{
+					var mes = qDictionary[msg.Name][i];
+					SendMessage(mes);
+				}
+				//continue;
+			}
+			else if (msg.Name == "" && msg.TypeMsg != "" && existType(msg.Name, msg.TypeMsg))
+			{
+				foreach (var key in qDictionary.Keys)
+				{
+					for (int i = qDictionary[key].Count - 1; i >= 0; i--)
+					{
+						if (qDictionary[key][i].TypeMsg == msg.TypeMsg)
+						{
+							var mes = qDictionary[key][i];
+							SendMessage(mes);
+						}
+						//continue;
+					}
+				}
+			}
+			else if (msg.Name == "" && msg.TypeMsg == "" && existName(msg.Name) && existType(msg.Name, msg.TypeMsg))
+			{
+				foreach (var key in qDictionary.Keys)
+				{
+					for (int i = qDictionary[key].Count - 1; i >= 0; i--)
+					{
+						var mes = qDictionary[key][i];
+						SendMessage(mes);
+						//continue;
+					}
+				}
+			}
+
+			//}
 		}
 
-		public void SendMessage(ref Message msg)
+		public void SendMessage(Message msg)
 		{
 			var r = false;
 			foreach (var subscriber in Broker.Subscribers)
@@ -94,7 +107,8 @@ namespace Lab1
 					r = true;
 				}
 			}
-			if (r) qDictionary[msg.Name].Remove(msg);
+			if (r)
+				qDictionary[msg.Name].Remove(msg);
 		}
 
 		private bool existType(string msgName, string msgTypeMsg)
@@ -130,8 +144,11 @@ namespace Lab1
 
 		public void DeserializeQueue(string fileName)
 		{
-			var str = File.ReadAllText(fileName);
-			qDictionary = JsonConvert.DeserializeObject<ConcurrentDictionary<string, List<Message>>>(str);
+			if (File.Exists(fileName))
+			{
+				var str = File.ReadAllText(fileName);
+				qDictionary = JsonConvert.DeserializeObject<ConcurrentDictionary<string, List<Message>>>(str);
+			}
 		}
 		
 		public void Dispose()
