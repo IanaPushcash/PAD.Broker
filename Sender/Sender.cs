@@ -50,5 +50,10 @@ namespace Sender
 		{
 			Send(new Message() {Name = name, IsSender = true, Msg = "", TypeMsg = "die"});
 		}
+
+		~Sender()
+		{
+			Send(new Message() { Name = name, IsSender = true, Msg = "", TypeMsg = "die" });
+		}
 	}
 }

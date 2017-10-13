@@ -9,26 +9,27 @@ using Newtonsoft.Json;
 
 namespace Reciever
 {
-	class Reciever: IDisposable
+	class Reciever 
 	{
 		const int port = 8888;
 		const string address = "127.0.0.1";
-
+		private NetworkStream stream;
+		private TcpClient client;
+		//public static bool WillDie = false;
 
 		private string name;
+
 		public Reciever(string name)
 		{
 			this.name = name;
+			client = new TcpClient(address, port);
+			stream = client.GetStream();
 		}
 
 		public void Send(Message msg)
 		{
-			TcpClient client = null;
 			try
 			{
-				client = new TcpClient(address, port);
-				NetworkStream stream = client.GetStream();
-
 				byte[] data = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(msg));
 				// отправка сообщения
 				stream.Write(data, 0, data.Length);
@@ -50,22 +51,38 @@ namespace Reciever
 						var message = builder.ToString();
 						Console.WriteLine("Was got {0}", message);
 					}
+					//if (WillDie)
+					//{
+					//	willDie();
+					//	break;
+					//}
 				}
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
 			}
-			finally
-			{
-				client.Close();
-			}
 		}
 
-		public void Dispose()
-		{
-			Send(new Message() { Name = name, IsSender = true, Msg = "", TypeMsg = "die" });
-		}
-		
+		//public void Dispose()
+		//{
+		//	Send(new Message() {Name = name, IsSender = true, Msg = "", TypeMsg = "die"});
+		//}
+
+		//~Reciever()
+		//{
+		//	byte[] data = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(new Message() { Name = name, IsSender = true, Msg = "", TypeMsg = "die" }));
+		//	// отправка сообщения
+		//	stream.Write(data, 0, data.Length);
+		//	client?.Close();
+		//}
+
+		//private void willDie()
+		//{
+		//	byte[] data = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(new Message() { Name = name, IsSender = true, Msg = "", TypeMsg = "willdie" }));
+		//	// отправка сообщения
+		//	stream.Write(data, 0, data.Length);
+		//	WillDie = false;
+		//}
 	}
 }

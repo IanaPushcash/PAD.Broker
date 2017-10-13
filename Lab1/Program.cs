@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ namespace Lab1
 		private static Thread _serverThread;
 		static void Main(string[] args)
 		{
+			handler = new ConsoleEventDelegate(ConsoleEventCallback);
+			SetConsoleCtrlHandler(handler, true);
 			_serverThread = new Thread(startServer) {IsBackground = true};
 			_serverThread.Start();
 			Console.ReadLine();
@@ -50,5 +53,19 @@ namespace Lab1
 			}
 
 		}
+
+		static bool ConsoleEventCallback(int eventType)
+		{
+			if (eventType == 2)
+			{
+				Broker.Dispose();
+			}
+			return false;
+		}
+		static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected
+		// Pinvoke
+		private delegate bool ConsoleEventDelegate(int eventType);
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, bool add);
 	}
 }

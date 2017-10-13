@@ -160,5 +160,37 @@ namespace Lab1
 		{
 			SerializeQueue(fileName);
 		}
+
+		public void SendDieMessage(Message msg, NetworkStream stream)
+		{
+			Message mes = new Message()
+			{
+				TypeMsg = "Info",
+				Name = "Server",
+				IsSender = false,
+				Msg = $"The client {msg.Name} die"
+			};
+
+			foreach (var subscriber in Broker.Subscribers)
+			{
+				GetAnswerMsg(mes, subscriber.client.GetStream());
+			}
+		}
+
+		public void SendWillDieMessage(Message msg, NetworkStream stream)
+		{
+			Message mes = new Message()
+			{
+				TypeMsg = "Info",
+				Name = "Server",
+				IsSender = false,
+				Msg = $"The client {msg.Name} will die"
+			};
+
+			foreach (var subscriber in Broker.Subscribers)
+			{
+				GetAnswerMsg(mes, subscriber.client.GetStream());
+			}
+		}
 	}
 }
