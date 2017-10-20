@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace Lab1
 {
@@ -14,11 +15,38 @@ namespace Lab1
 		private static readonly Broker instance = new Broker();
 		private static ListDictionary queueDictionary;
 		public static List<Client> Subscribers { get; set; }
+		public static List<Client> Publishers { get; set; }
 		//public static Dictionary<Client, DateTime> Publishers { get; set; }
 		private Broker()
 		{
 			queueDictionary = new ListDictionary();
 			Subscribers = new List<Client>();
+			Publishers = new List<Client>();
+
+			Task checkPublishers = new Task(() =>
+			{
+				while (true)
+				{
+					if (Publishers.Count > 0)
+						for (int i = 0; i < Publishers.Count; i++)
+						{
+							try
+							{
+								var retMsg = Encoding.Unicode.GetBytes("Check");
+								//stream.Write(retMsg, 0, retMsg.Length);
+								Publishers[i].client.GetStream().Write(retMsg, 0, retMsg.Length);
+							}
+							catch
+							{
+								ListDictionary.SendDieMessage(new Message() {Name = Publishers[i].ClientName});
+								Publishers.Remove(Publishers[i--]);
+							}
+						}
+					Thread.Sleep(15000);
+				}
+
+			});
+			checkPublishers.Start();
 			//Publishers = new Dictionary<Client, DateTime>();
 		}
 
@@ -35,32 +63,16 @@ namespace Lab1
 					queueDictionary.AddMessage(msg);
 				else
 				{
-
-					//if (!QueueDictionary.ContainsKey(msg.TypeMsg))
-					//{
-					//	GetAnswerMsg(new Message() {IsSender = false, Msg = "Non-existend type msg", Name = "Server", TypeMsg = "Error"}, stream );
-					//	return;
-					//}
-					//if (QueueDictionary[msg.TypeMsg].Count == 0)
-					//{
-					//	GetAnswerMsg(new Message() { IsSender = false, Msg = "Queue is empty", Name = "Server", TypeMsg = "Error" }, stream);
-					//	return;
-					//}
-					//Message m = new Message();
-					//QueueDictionary[msg.TypeMsg].TryDequeue(out m);
-					//while (true)
-					//{
+					
 						queueDictionary.SendMessageSub(msg, stream);
-						//GetAnswerMsg(new Message() { Msg = "Hello" }, stream);
-					//}
 				}
 					
 			}
 			else if (msg.TypeMsg == "willdie")
-				queueDictionary.SendWillDieMessage(msg, stream);
+				queueDictionary.SendWillDieMessage(msg);
 			else if (msg.TypeMsg == "die")
 			{
-				queueDictionary.SendDieMessage(msg, stream);
+				ListDictionary.SendDieMessage(msg);
 			}
 		}
 

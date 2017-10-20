@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Lab1
 {
-	class ListDictionary:IDisposable
+	class ListDictionary : IDisposable
 	{
 		private ConcurrentDictionary<string, List<Message>> qDictionary;
 
@@ -103,8 +103,11 @@ namespace Lab1
 				if ((subscriber.TargetAuthor == "" || subscriber.TargetAuthor == msg.Name) &&
 				    (subscriber.TargetType == "" || subscriber.TargetType == msg.TypeMsg))
 				{
-					GetAnswerMsg(msg, subscriber.client.GetStream());
-					r = true;
+					if (subscriber.client.Connected)
+					{
+						GetAnswerMsg(msg, subscriber.client.GetStream());
+						r = true;
+					}
 				}
 			}
 			if (r)
@@ -113,7 +116,7 @@ namespace Lab1
 
 		private bool existType(string msgName, string msgTypeMsg)
 		{
-			if (msgTypeMsg == "" && qDictionary.Keys.Count > 0 && qDictionary.Any(l=>l.Value.Count>0)) return true;
+			if (msgTypeMsg == "" && qDictionary.Keys.Count > 0 && qDictionary.Any(l => l.Value.Count > 0)) return true;
 			if (msgName != "" && existName(msgName)) return qDictionary[msgName].Any(q => q.TypeMsg == msgTypeMsg);
 			if (msgName == "") return existName(msgName);
 			foreach (var key in qDictionary.Keys)
@@ -126,13 +129,22 @@ namespace Lab1
 
 		private bool existName(string msgName)
 		{
-			return qDictionary.Keys.Contains(msgName) || (msgName == "" && qDictionary.Keys.Count>0);
+			return qDictionary.Keys.Contains(msgName) || (msgName == "" && qDictionary.Keys.Count > 0);
 		}
 
-		public void GetAnswerMsg(Message msg, NetworkStream stream)
+		public static void GetAnswerMsg(Message msg, NetworkStream stream)
 		{
-			var retMsg = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(msg));
-			stream.Write(retMsg, 0, retMsg.Length);
+			try
+			{
+				var retMsg = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(msg));
+				stream.Write(retMsg, 0, retMsg.Length);
+
+			}
+			catch
+			{
+				///if (Broker.Subscribers.Any(s => s.client.GetStream() == stream))
+					//Broker.Subscribers.RemoveAll(s => !s.client.Connected);
+			}
 		}
 
 		public void SerializeQueue(string fileName)
@@ -161,7 +173,7 @@ namespace Lab1
 			SerializeQueue(fileName);
 		}
 
-		public void SendDieMessage(Message msg, NetworkStream stream)
+		public static void SendDieMessage(Message msg)
 		{
 			Message mes = new Message()
 			{
@@ -173,11 +185,12 @@ namespace Lab1
 
 			foreach (var subscriber in Broker.Subscribers)
 			{
+				if (subscriber.client.Connected)
 				GetAnswerMsg(mes, subscriber.client.GetStream());
 			}
 		}
 
-		public void SendWillDieMessage(Message msg, NetworkStream stream)
+		public void SendWillDieMessage(Message msg)
 		{
 			Message mes = new Message()
 			{
@@ -189,7 +202,8 @@ namespace Lab1
 
 			foreach (var subscriber in Broker.Subscribers)
 			{
-				GetAnswerMsg(mes, subscriber.client.GetStream());
+				if (subscriber.client.Connected)
+					GetAnswerMsg(mes, subscriber.client.GetStream());
 			}
 		}
 	}

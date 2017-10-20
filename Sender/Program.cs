@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Mime;
-using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Lab1;
@@ -17,6 +10,7 @@ namespace Sender
 	class Program
 	{
 		private static Sender sender;
+
 		static void Main(string[] args)
 		{
 			handler = new ConsoleEventDelegate(ConsoleEventCallback);
@@ -35,32 +29,37 @@ namespace Sender
 			{
 				i = 0;
 			}
+			sender = new Sender(sName);
 			Task task = new Task(() =>
 			{
-				sender = new Sender(sName);
 				while (true)
 				{
-					var start = DateTime.Now;
+					//var start = DateTime.Now;
 					if (msgType == "die")
 					{
-						sender.Send(new Message() {IsSender = true, Msg = "", Name = sName, TypeMsg = "willdie"});
+						sender.Send(new Message() {IsSender = true, Msg = "", Name = sender.name, TypeMsg = "willdie"});
 						Environment.Exit(0);
 					}
 					else
 					{
-						var msg = new Message() {IsSender = true, Msg = i + "", Name = sName, TypeMsg = msgType};
+						var msg = new Message() {IsSender = true, Msg = i + "", Name = sender.name, TypeMsg = msgType};
 						sender.Send(msg);
 						i++;
 						Console.WriteLine("Sended " + JsonConvert.SerializeObject(msg));
 					}
-					while (start.AddSeconds(10) > DateTime.Now)
-					{
-					}
-					;
+					//while (start.AddSeconds(10) > DateTime.Now)
+					//{
+					//}
+					Thread.Sleep(10000);
 				}
 
 			});
 			task.Start();
+			Task waiting = new Task(() =>
+			{
+				sender.Wait();
+			});
+			waiting.Start();
 			while (true)
 			{
 				Console.WriteLine("Enter msg type: ");

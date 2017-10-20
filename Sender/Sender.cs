@@ -14,25 +14,58 @@ namespace Sender
 	{
 		const int port = 8888;
 		const string address = "127.0.0.1";
-		
+		private NetworkStream stream;
+		private TcpClient client = null;
 
-		private string name;
+		public string name { get; set; }
 		public Sender(string name)
 		{
 			this.name = name;
+			client = new TcpClient(address, port);
+			stream = client.GetStream();
 		}
 
 		public void Send(Message msg)
 		{
-			TcpClient client = null;
 			try
 			{
-				client = new TcpClient(address, port);
-				NetworkStream stream = client.GetStream();
-
 				byte[] data = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(msg));
 				// отправка сообщения
 				stream.Write(data, 0, data.Length);
+				
+				
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			//finally
+			//{
+			//	client.Close();
+			//}
+		}
+
+		public void Wait()
+		{
+			try
+			{
+				while (true)
+				{
+					if (stream.DataAvailable)
+					{
+						// получаем ответ
+						byte[] data = new byte[1000000]; // буфер для получаемых данных
+						StringBuilder builder = new StringBuilder();
+						int bytes = 0;
+						do
+						{
+							bytes = stream.Read(data, 0, data.Length);
+							builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+						} while (stream.DataAvailable);
+						stream.Flush();
+						//name = name + "~" + builder.ToString();
+					}
+				}
 			}
 			catch (Exception ex)
 			{
