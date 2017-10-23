@@ -11,13 +11,13 @@ using Newtonsoft.Json;
 
 namespace Lab1
 {
-	class ListDictionary : IDisposable
+	class MessageDictionary : IDisposable
 	{
 		private ConcurrentDictionary<string, List<Message>> qDictionary;
 
 		private readonly string fileName = "ListDictionary.txt";
 
-		public ListDictionary()
+		public MessageDictionary()
 		{
 			qDictionary = new ConcurrentDictionary<string, List<Message>>();
 			DeserializeQueue(fileName);
@@ -168,7 +168,7 @@ namespace Lab1
 			SerializeQueue(fileName);
 		}
 
-		~ListDictionary()
+		~MessageDictionary()
 		{
 			SerializeQueue(fileName);
 		}

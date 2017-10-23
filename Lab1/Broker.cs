@@ -13,13 +13,13 @@ namespace Lab1
 	class Broker
 	{
 		private static readonly Broker instance = new Broker();
-		private static ListDictionary queueDictionary;
+		private static MessageDictionary queueDictionary;
 		public static List<Client> Subscribers { get; set; }
 		public static List<Client> Publishers { get; set; }
 		//public static Dictionary<Client, DateTime> Publishers { get; set; }
 		private Broker()
 		{
-			queueDictionary = new ListDictionary();
+			queueDictionary = new MessageDictionary();
 			Subscribers = new List<Client>();
 			Publishers = new List<Client>();
 
@@ -38,7 +38,7 @@ namespace Lab1
 							}
 							catch
 							{
-								ListDictionary.SendDieMessage(new Message() {Name = Publishers[i].ClientName});
+								MessageDictionary.SendDieMessage(new Message() {Name = Publishers[i].ClientName});
 								Publishers.Remove(Publishers[i--]);
 							}
 						}
@@ -72,7 +72,7 @@ namespace Lab1
 				queueDictionary.SendWillDieMessage(msg);
 			else if (msg.TypeMsg == "die")
 			{
-				ListDictionary.SendDieMessage(msg);
+				MessageDictionary.SendDieMessage(msg);
 			}
 		}
 
