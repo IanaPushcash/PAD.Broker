@@ -55,6 +55,7 @@ namespace Lab1
 						}
 						Broker.GetInstance().ProcessingMsg(msg, stream);
 					}
+					Thread.Sleep(100);
 				}
 				//	while (true)
 				//	{

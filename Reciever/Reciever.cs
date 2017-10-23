@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Lab1;
 using Newtonsoft.Json;
@@ -51,6 +52,7 @@ namespace Reciever
 						var message = builder.ToString();
 						Console.WriteLine("Was got {0}", message);
 					}
+					Thread.Sleep(100);
 					//if (WillDie)
 					//{
 					//	willDie();

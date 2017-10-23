@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Lab1;
 using Newtonsoft.Json;
@@ -65,6 +66,7 @@ namespace Sender
 						stream.Flush();
 						//name = name + "~" + builder.ToString();
 					}
+					Thread.Sleep(100);
 				}
 			}
 			catch (Exception ex)

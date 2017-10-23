@@ -40,6 +40,7 @@ namespace Lab1
 					// создаем новый поток для обслуживания нового клиента
 					Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
 					clientThread.Start();
+					Thread.Sleep(100);
 				}
 			}
 			catch (Exception ex)

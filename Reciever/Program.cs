@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Lab1;
 
@@ -39,6 +40,7 @@ namespace Reciever
 					//while (start.AddSeconds(10) > DateTime.Now) ;
 					//}
 					//if (msgType == "die") Environment.Exit(0);
+					Thread.Sleep(100);
 				}
 			});
 			task.Start();
